@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 
 public class HttpHelper {
 
-    public static void sendMusic(final Music music) {
+    public static void sendMusic(final MusicRec music) {
         new Thread(new Runnable() {
             @Override
             public void run() {

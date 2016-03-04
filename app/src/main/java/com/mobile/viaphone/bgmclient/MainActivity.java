@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.acrcloud.rec.sdk.ACRCloudClient;
 import com.acrcloud.rec.sdk.ACRCloudConfig;
 import com.acrcloud.rec.sdk.IACRCloudListener;
@@ -19,7 +20,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends Activity implements IACRCloudListener {
@@ -148,8 +152,8 @@ public class MainActivity extends Activity implements IACRCloudListener {
         }
         mResult.setText(result);
 
-        List<Music> musics = parseAcr(result);
-        for (Music music: musics) {
+        MusicRec music = parseAcr(result);
+        if (music != null) {
             HttpHelper.sendMusic(music);
         }
     }
@@ -170,85 +174,86 @@ public class MainActivity extends Activity implements IACRCloudListener {
         }
     }
 
-    private List<Music> parseAcr(String result) {
-        List<Music> musicList = new ArrayList<Music>();
+    private MusicRec parseAcr(String result) {
+
         try {
-            JSONObject j = new JSONObject(result);
-            JSONObject j1 = j.getJSONObject("status");
-            int j2 = j1.getInt("code");
-            if (j2 == 0) {
-                JSONObject metadata = j.getJSONObject("metadata");
+            JSONObject jResult = new JSONObject(result);
+            JSONObject status = jResult.getJSONObject("status");
+            if (status.getInt("code") == 0) {
+                JSONObject metadata = jResult.getJSONObject("metadata");
                 if (metadata.has("music")) {
+
+                    MusicRec musicReq = new MusicRec();
+                    musicReq.setCustomer("islam");
+
                     JSONArray musics = metadata.getJSONArray("music");
-                    for (int i = 0; i < musics.length(); i++) {
-                        JSONObject tt = (JSONObject) musics.get(i);
-                        Music music = new Music();
-                        music.setCustomer("islam");
-                        music.setAcrId(tt.getString("acrid"));
+                    JSONObject tt = (JSONObject) musics.get(0);
+                    Music music = new Music();
+                    music.setAcrid(tt.getString("acrid"));
 
-                        JSONArray artistt = tt.getJSONArray("artists");
-                        JSONObject art = (JSONObject) artistt.get(0);
-                        music.setArtists(art.getString("name"));
-
-                        if (!tt.isNull("title")) {
-                            music.setTitle(tt.getString("title"));
-                        }
-                        if (!tt.isNull("genres")) {
-                            music.setGenres(tt.getString("genres"));
-                        }
-
-                        if (!tt.isNull("album")) {
-                            music.setAlbumName(tt.getJSONObject("album").getString("name"));
-                        }
-
-                        if (!tt.isNull("duration_ms")) {
-                            music.setDuration(tt.getLong("duration_ms") / 1000);
-                        }
-
-                        if (!tt.isNull("label")) {
-                            music.setLabel(tt.getString("label"));
-                        }
-
-//                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-//                        if (!tt.isNull("release_date")) {
-//                            music.setReleaseDate(format.parse(tt.getString("release_date")));
-//                        }
-//                        format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                        music.setRecDate(format.parse(metadata.getString("timestamp_utc")));
-                        musicList.add(music);
+                    if (!tt.isNull("title")) {
+                        music.setTitle(tt.getString("title"));
                     }
-                }
-                if (metadata.has("humming")) {
-                    JSONArray hummings = metadata.getJSONArray("humming");
-                    for (int i = 0; i < hummings.length(); i++) {
-                        JSONObject tt = (JSONObject) hummings.get(i);
-                        String title = tt.getString("title");
-                        JSONArray artistt = tt.getJSONArray("artists");
-                        JSONObject art = (JSONObject) artistt.get(0);
-                        String artist = art.getString("name");
+
+                    if (!tt.isNull("label")) {
+                        music.setLabel(tt.getString("label"));
                     }
-                }
-                if (metadata.has("streams")) {
-                    JSONArray musics = metadata.getJSONArray("streams");
-                    for (int i = 0; i < musics.length(); i++) {
-                        JSONObject tt = (JSONObject) musics.get(i);
-                        String title = tt.getString("title");
-                        JSONArray channelId = tt.getJSONArray("channel_id");
-//						tres = tres + (i+1) + ".  Title: " + title + "    Channel Id: " + channelId + "\n";
+
+                    if (!tt.isNull("duration_ms")) {
+                        music.setDuration(tt.getLong("duration_ms") / 1000);
                     }
-                }
-                if (metadata.has("custom_files")) {
-                    JSONArray musics = metadata.getJSONArray("custom_files");
-                    for (int i = 0; i < musics.length(); i++) {
-                        JSONObject tt = (JSONObject) musics.get(i);
-                        String title = tt.getString("title");
-//						tres = tres + (i+1) + ".  Title: " + title + "\n";
+
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    if (!tt.isNull("release_date")) {
+                        music.setReleaseDate(format.parse(tt.getString("release_date")));
                     }
+
+                    if (!tt.isNull("album")) {
+                        music.setAlbum(tt.getJSONObject("album").getString("name"));
+                    }
+
+                    if (!tt.isNull("genres")) {
+                        JSONArray genres = tt.getJSONArray("genres");
+                        for (int j = 0; j < genres.length(); j++) {
+                            JSONObject genre = (JSONObject) genres.get(j);
+                            music.addGenre(genre.getString("name"));
+                        }
+                    }
+
+                    if (!tt.isNull("artists")) {
+                        JSONArray artists = tt.getJSONArray("artists");
+                        for (int j = 0; j < artists.length(); j++) {
+                            JSONObject artist = (JSONObject) artists.get(j);
+                            music.addArtist(artist.getString("name"));
+                        }
+                    }
+
+                    if (!tt.isNull("play_offset_ms")) {
+                        music.setPlayOffset(tt.getLong("play_offset_ms"));
+                    }
+
+                    if (!tt.isNull("external_ids")) {
+                        JSONObject externalIds = tt.getJSONObject("external_ids");
+                        if (!externalIds.isNull("isrc")) {
+                            music.setIsrcCode(externalIds.getString("isrc"));
+                        }
+
+                        if (!externalIds.isNull("upc")) {
+                            music.setUpcCode(externalIds.getString("upc"));
+                        }
+                    }
+
+                    musicReq.setMusic(music);
+                    format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    musicReq.setRecDate(format.parse(metadata.getString("timestamp_utc")));
+                    return musicReq;
                 }
             }
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        return musicList;
+        return null;
     }
 }

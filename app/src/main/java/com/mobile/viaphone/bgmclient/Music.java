@@ -1,34 +1,29 @@
 package com.mobile.viaphone.bgmclient;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Music {
 
-    private String customer;
-    private String label;
-    private Date releaseDate;
+    private String acrid;
     private String title;
-    private long duration;
-    private String albumName;
-    private String acrId;
-    private String genres;
-    private String artists;
-    private Date recDate;
+    private String label;
+    private Long duration;
+    private Date releaseDate;
+    private String album;
+    private List<String> genres;
+    private List<String> artists;
+    private Long playOffset;
+    private String isrcCode;
+    private String upcCode;
 
-    public String getLabel() {
-        return label;
+    public String getAcrid() {
+        return acrid;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public Date getReleaseDate() {
-        return releaseDate;
-    }
-
-    public void setReleaseDate(Date releaseDate) {
-        this.releaseDate = releaseDate;
+    public void setAcrid(String acrid) {
+        this.acrid = acrid;
     }
 
     public String getTitle() {
@@ -39,59 +34,85 @@ public class Music {
         this.title = title;
     }
 
-    public long getDuration() {
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public Long getDuration() {
         return duration;
     }
 
-    public void setDuration(long duration) {
+    public void setDuration(Long duration) {
         this.duration = duration;
     }
 
-    public String getAlbumName() {
-        return albumName;
+    public Date getReleaseDate() {
+        return releaseDate;
     }
 
-    public void setAlbumName(String albumName) {
-        this.albumName = albumName;
+    public void setReleaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate;
     }
 
-    public String getAcrId() {
-        return acrId;
+    public String getAlbum() {
+        return album;
     }
 
-    public void setAcrId(String acrId) {
-        this.acrId = acrId;
+    public void setAlbum(String album) {
+        this.album = album;
     }
 
-    public String getGenres() {
+    public List<String> getGenres() {
         return genres;
     }
 
-    public void setGenres(String genres) {
+    public void setGenres(List<String> genres) {
         this.genres = genres;
     }
 
-    public String getArtists() {
+    public void addGenre(String genre) {
+        if (this.genres == null) this.genres = new ArrayList<String>();
+        this.genres.add(genre);
+    }
+
+    public List<String> getArtists() {
         return artists;
     }
 
-    public void setArtists(String artists) {
+    public void setArtists(List<String> artists) {
         this.artists = artists;
     }
 
-    public Date getRecDate() {
-        return recDate;
+    public void addArtist(String artist) {
+        if (this.artists == null) this.artists = new ArrayList<String>();
+        this.artists.add(artist);
     }
 
-    public void setRecDate(Date recDate) {
-        this.recDate = recDate;
+    public Long getPlayOffset() {
+        return playOffset;
     }
 
-    public String getCustomer() {
-        return customer;
+    public void setPlayOffset(Long playOffset) {
+        this.playOffset = playOffset;
     }
 
-    public void setCustomer(String customer) {
-        this.customer = customer;
+    public String getIsrcCode() {
+        return isrcCode;
+    }
+
+    public void setIsrcCode(String isrcCode) {
+        this.isrcCode = isrcCode;
+    }
+
+    public String getUpcCode() {
+        return upcCode;
+    }
+
+    public void setUpcCode(String upcCode) {
+        this.upcCode = upcCode;
     }
 }
