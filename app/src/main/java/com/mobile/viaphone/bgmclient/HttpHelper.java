@@ -6,6 +6,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -30,7 +31,7 @@ public class HttpHelper {
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost httpPost = new HttpPost(uri);
             httpPost.setHeader("Content-Type", "application/json");
-            StringEntity postBodyEntity = new StringEntity(body);
+            StringEntity postBodyEntity = new StringEntity(body, HTTP.UTF_8);
             httpPost.setEntity(postBodyEntity);
 
             HttpResponse response = httpClient.execute(httpPost);
