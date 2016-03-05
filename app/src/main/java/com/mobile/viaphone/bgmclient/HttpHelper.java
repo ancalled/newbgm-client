@@ -18,7 +18,7 @@ public class HttpHelper {
             @Override
             public void run() {
                 try {
-                    sendPost("http://192.168.1.7/music-rec", new Gson().toJson(music));
+                    sendPost("http://ec2-54-213-41-197.us-west-2.compute.amazonaws.com:8080/newbgm/music-rec", new Gson().toJson(music));
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
