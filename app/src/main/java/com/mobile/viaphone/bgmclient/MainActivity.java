@@ -3,6 +3,7 @@ package com.mobile.viaphone.bgmclient;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -20,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ public class MainActivity extends Activity implements IACRCloudListener {
 
     private ACRCloudClient mClient;
     private ACRCloudConfig mConfig;
+    private AcrConfig acrConfig;
 
     private TextView mVolume, mResult, tv_time;
 
@@ -50,6 +53,9 @@ public class MainActivity extends Activity implements IACRCloudListener {
         if (!file.exists()) {
             file.mkdirs();
         }
+
+        String auth = Base64.encodeToString("islam:123".getBytes(), Base64.DEFAULT);
+        HttpHelper.getAcrData(auth);
 
         mVolume = (TextView) findViewById(R.id.volume);
         mResult = (TextView) findViewById(R.id.result);
@@ -94,12 +100,16 @@ public class MainActivity extends Activity implements IACRCloudListener {
 
     public void start() {
         if (!this.initState) {
+            AcrConfig acrConfig = HttpHelper.getAcrConfig();
             this.mConfig = new ACRCloudConfig();
             this.mConfig.acrcloudListener = this;
             this.mConfig.context = this;
-            this.mConfig.host = "ap-southeast-1.api.acrcloud.com";
-            this.mConfig.accessKey = "8e59a4a51aca4cc1d865868eb8bea8cd";
-            this.mConfig.accessSecret = "KWfTDefYGipu8lfjUryCDneZSuBsod6zHv4ns5SL";
+            this.mConfig.host = acrConfig.getHost();
+            this.mConfig.accessKey = acrConfig.getAccessKey();
+            this.mConfig.accessSecret = acrConfig.getAccessSecret();
+//            this.mConfig.host = "ap-southeast-1.api.acrcloud.com";
+//            this.mConfig.accessKey = "8e59a4a51aca4cc1d865868eb8bea8cd";
+//            this.mConfig.accessSecret = "KWfTDefYGipu8lfjUryCDneZSuBsod6zHv4ns5SL";
             this.mConfig.reqMode = ACRCloudConfig.ACRCloudRecMode.REC_MODE_REMOTE;
 
             this.mClient = new ACRCloudClient();
