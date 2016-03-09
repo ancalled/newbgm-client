@@ -16,8 +16,8 @@ import java.io.InputStreamReader;
 
 public class HttpHelper {
 
-    private static final String host = "http://192.168.1.5/customer/";
-    //    private static final String host = "http://ec2-54-213-41-197.us-west-2.compute.amazonaws.com:8080/newbgm/customer";
+    //    private static final String host = "http://192.168.1.5/customer/";
+    private static final String host = "http://ec2-54-213-41-197.us-west-2.compute.amazonaws.com:8080/newbgm/customer/";
     private static final String musicRecUrl = "music-rec";
     private static final String acrConfigUrl = "acr-data";
 
@@ -41,11 +41,11 @@ public class HttpHelper {
         }).start();
     }
 
-    public static void sendMusic(final MusicRec music) {
+    public static void sendMusic(final MusicRec music, final String auth) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                sendPost(host + musicRecUrl, new Gson().toJson(music));
+                sendPost(host + musicRecUrl, new Gson().toJson(music), auth);
             }
         }).start();
     }
@@ -63,11 +63,12 @@ public class HttpHelper {
         return null;
     }
 
-    private static String sendPost(String uri, String body) {
+    private static String sendPost(String uri, String body, String auth) {
         try {
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost httpPost = new HttpPost(uri);
             httpPost.setHeader("Content-Type", "application/json");
+            httpPost.setHeader("Authorization", "Basic " + auth.replace("\n", "").replace("\r", ""));
             StringEntity postBodyEntity = new StringEntity(body, HTTP.UTF_8);
             httpPost.setEntity(postBodyEntity);
             HttpResponse response = httpClient.execute(httpPost);
